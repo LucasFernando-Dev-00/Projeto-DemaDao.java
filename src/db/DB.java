@@ -4,6 +4,7 @@ import db.DbException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -28,7 +29,7 @@ public class DB {
 		}
 		return conn;
 	}
-	
+
 	public static void closeConnection() {
 		if (conn != null) {
 			try {
@@ -38,18 +39,23 @@ public class DB {
 			}
 		}
 	}
-	
+
 	private static Properties loadProperties() {
-		try (FileInputStream fs = new FileInputStream("db.properties")) {
+		try (InputStream is = new FileInputStream("db.properties")) {
+			if (is == null) {
+				throw new DbException("Arquivo db.properties não encontrado");
+
+			}
+
 			Properties props = new Properties();
-			props.load(fs);
+			props.load(is);
 			return props;
 		}
 		catch (IOException e) {
 			throw new DbException(e.getMessage());
 		}
 	}
-	
+
 	public static void closeStatement(Statement st) {
 		if (st != null) {
 			try {
